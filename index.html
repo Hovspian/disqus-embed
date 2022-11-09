@@ -1,10 +1,102 @@
 <head>
   <meta property="og:image" content="//avatars3.githubusercontent.com/u/31325961?s=40&v=4">
+    
+  <style>
+    #disqus_thread a {
+      color: var(--saved-anchor-color, #0000EE);
+    }
+
+    body {
+      background-color: var(--saved-background-color, white);
+    }
+
+    #preview-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 500px;
+      height: 100px;
+      background-color: var(--preview-background-color, white);
+      color: var(--preview-anchor-color, #0000EE);
+    }
+  </style>
 </head>
 <body>
   <div>
     <a href="#disqus_thread" data-disqus-identifier="hovsep-external-test">TEST COMMENT COUNT</a>
   </div>
+  
+  <div>
+    <div id="background-color-picker-container">
+      Pick a background color:&nbsp;
+      <input type="color" id="background-color-picker" name="background-color-picker"/>
+    <div id="anchor-color-picker-container">
+      Pick an anchor color:&nbsp;
+      <input type="color" id="anchor-color-picker" name="anchor-color-picker" />
+    </div>
+
+    <button type="button" id="color-picker-save" onclick="saveColors()">
+      Save
+    </button>
+
+    <div id="preview-container">
+      This is a preview of what the background and anchor colors look like together
+    </div>
+  </div>
+
+  <script>
+    function initColorPickers() {
+      let defaultBackgroundColor = '#ffffff';
+      let defaultAnchorColor = '#0000EE';
+      try {
+        defaultBackgroundColor = JSON.parse(window.localStorage.getItem('saved_background_color')) || defaultBackgroundColor;
+        defaultAnchorColor = JSON.parse(window.localStorage.getItem('saved_anchor_color')) || defaultAnchorColor;
+      } catch (err) {
+        // pass
+      }
+
+      document.querySelector(':root').style.setProperty('--saved-background-color', defaultBackgroundColor);
+      document.querySelector(':root').style.setProperty('--preview-background-color', defaultBackgroundColor);
+      document.querySelector(':root').style.setProperty('--saved-anchor-color', defaultAnchorColor);
+      document.querySelector(':root').style.setProperty('--preview-anchor-color', defaultAnchorColor);
+
+      const backgroundColorPicker = document.querySelector('#background-color-picker');
+      backgroundColorPicker.value = defaultBackgroundColor;
+      backgroundColorPicker.addEventListener("input", updateBackgroundColorPreview, false);
+
+      const anchorColorPicker = document.querySelector('#anchor-color-picker');
+      anchorColorPicker.value = defaultAnchorColor;
+      anchorColorPicker.addEventListener("input", updateAnchorColorPreview, false);
+    }
+
+    function updateBackgroundColorPreview(evt) {
+      document.querySelector(':root').style.setProperty('--preview-background-color', evt.target.value);
+    }
+
+    function updateAnchorColorPreview(evt) {
+      document.querySelector(':root').style.setProperty('--preview-anchor-color', evt.target.value);
+    }
+
+    function saveColors(evt) {
+      const backgroundColorPicker = document.querySelector('#background-color-picker');
+      const anchorColorPicker = document.querySelector('#anchor-color-picker');
+      document.querySelector(':root').style.setProperty('--saved-background-color', backgroundColorPicker.value);
+      document.querySelector(':root').style.setProperty('--saved-anchor-color', anchorColorPicker.value);
+
+      try {
+        window.localStorage.setItem('saved_background_color', JSON.stringify(backgroundColorPicker.value));
+        window.localStorage.setItem('saved_anchor_color', JSON.stringify(anchorColorPicker.value));
+      } catch (err) {
+        // pass
+      }
+
+      if (window.DISQUS) {
+        window.DISQUS.reset({ reload: true });
+      }
+    }
+
+    initColorPickers();
+  </script>
   
   <div id="disqus_thread"></div>
   <script>
